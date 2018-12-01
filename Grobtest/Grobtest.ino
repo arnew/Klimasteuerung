@@ -118,7 +118,7 @@ float duty24h() {
   for (int i = 0; i < 24; i++) {
     r += get_duty(i);
   }
-  return r / 24;
+  return r / min(d.zyklen/HOUR+1, 24);
 }
 
 void update_duty(bool fan) {

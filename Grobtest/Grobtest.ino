@@ -55,6 +55,7 @@ void setup() {
     }
   }
 
+
   pinMode(13, OUTPUT);
 }
 //------------------------------------------------------------------------------
@@ -95,19 +96,23 @@ debug d;
 
 bool fan = false;
 
+#define HOUR (60*60/2)
+//#define HOUR (10)
 
 unsigned short duty_h[24] =
-{0};
+{ 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0
+};
 //{0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1600, 1400, 1200, 1000, 800};
 
-static byte last_hour = 0;
-float get_duty(byte i) {
-  float a = duty_h[i];
-  if (i == last_hour) a /= min(d.zyklen, 60 * 60 / 2);
-  else a /= 60 * 60 / 2;
+static unsigned char last_hour = 0;
+float get_duty(unsigned i) {
+  float a = duty_h[i % 24];
+  if (i == last_hour) a /= min(d.zyklen, HOUR);
+  else a /= HOUR;
   return a;
 }
-
 float duty24h() {
   float r = 0;
   for (int i = 0; i < 24; i++) {
@@ -119,7 +124,7 @@ float duty24h() {
 void update_duty(bool fan) {
   d.zyklen++;
 
-  byte hour = (d.zyklen / (60 * 60 / 2)) % 24;
+  unsigned hour = (d.zyklen / (HOUR)) % 24;
   if (hour != last_hour) {
     duty_h[hour] = 0;
   }
@@ -217,9 +222,8 @@ void show_info() {
 
       // 56 - 128 24-32
       for (int i = 0; i < 24; i++)  {
-        byte hour = (d.zyklen / (60 * 60 / 2)) % 24;
-        float dt = get_duty((last_hour + i) % 24);
-        display.fillRect(56 + 3 * i, 31 - 7 * dt , 2, 8, WHITE);
+        float dt = get_duty(((24 + last_hour - i) % 24));
+        display.fillRect(56 + 3 * i, 31 - 7 * dt , dt ? 2 : 1, dt ? 8 : 1, WHITE);
       }
 
       break;
@@ -281,9 +285,9 @@ void decide() {
   if (d.u = (Ha > Hi * 1.25)) goto no_fan;
   // zu kalt, aber aussen nicht waermer
   if (d.w = (Ti < Tsl && Ta < Ti)) {
-    if (Ti < 0 && (duty24h() > 0.05 || get_duty(0) > 0.5)) goto no_fan;
-    if (Ti < 5 && (duty24h() > 0.15 || get_duty(0) > 0.5)) goto no_fan;
-    if ((duty24h() > 0.3 || get_duty(0) > 0.5)) goto no_fan;
+    if (Ta < 0 && (duty24h() > 0.01 || get_duty(0) > 0.01)) goto no_fan;
+    if (Ta < 5 && (duty24h() > 0.05 || get_duty(0) > 0.05)) goto no_fan;
+    if ((duty24h() > 0.10 || get_duty(0) > 0.10)) goto no_fan;
   }
   // zu warm, aber aussen nicht kaelter
   if (d.c = (Ti > Tsh && Ta > Ti)) goto no_fan;

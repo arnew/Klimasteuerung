@@ -49,9 +49,11 @@ void setup() {
   // (you can also pass in a Wire library object like &Wire2)
   bool status = bme.begin();
   if (!status) {
-    Serial.println("Could not find a valid BME280 sensor, check wiring!");
+    status = bme.begin(0x76);
+    if (!status) {
+      Serial.println("Could not find a valid BME280 sensor, check wiring!");
+    }
   }
-
 
   pinMode(13, OUTPUT);
 }
@@ -216,7 +218,7 @@ void show_info() {
       // 56 - 128 24-32
       for (int i = 0; i < 24; i++)  {
         byte hour = (d.zyklen / (60 * 60 / 2)) % 24;
-        float dt = get_duty((last_hour+i) % 24);
+        float dt = get_duty((last_hour + i) % 24);
         display.fillRect(56 + 3 * i, 31 - 7 * dt , 2, 8, WHITE);
       }
 
@@ -264,7 +266,7 @@ void show_info() {
   Serial.print(" "); Serial.print((float)100.0 * duty24h());
 
   Serial.print(" "); Serial.print(abs((int)(
-    d.zyklen % 200) - 100));
+                                        d.zyklen % 200) - 100));
 
 
   Serial.println("");
@@ -279,9 +281,9 @@ void decide() {
   if (d.u = (Ha > Hi * 1.25)) goto no_fan;
   // zu kalt, aber aussen nicht waermer
   if (d.w = (Ti < Tsl && Ta < Ti)) {
-    if (Ti < 0 && (duty24h() > 0.05||get_duty(0)>0.5)) goto no_fan;
-    if (Ti < 5 && (duty24h() > 0.15||get_duty(0)>0.5)) goto no_fan;
-    if ((duty24h() > 0.3||get_duty(0)>0.5)) goto no_fan;
+    if (Ti < 0 && (duty24h() > 0.05 || get_duty(0) > 0.5)) goto no_fan;
+    if (Ti < 5 && (duty24h() > 0.15 || get_duty(0) > 0.5)) goto no_fan;
+    if ((duty24h() > 0.3 || get_duty(0) > 0.5)) goto no_fan;
   }
   // zu warm, aber aussen nicht kaelter
   if (d.c = (Ti > Tsh && Ta > Ti)) goto no_fan;

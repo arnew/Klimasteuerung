@@ -280,6 +280,7 @@ void show_info() {
 
 void decide() {
   // innen nicht kondensieren:
+  d.p = d.u = d.w = d.c = 0;
   if (d.p = (Tpa > Ti * 0.8)) goto no_fan;
   // nur trocknen:
   if (d.u = (Ha > Hi * 1.25)) goto no_fan;

@@ -78,18 +78,18 @@ float Ta, rHa, Tpa, Hi;
 
 float Ti, rHi, Tpi, Ha;
 
-float Tsh = 20, Tsl = 10;
+float Tsh = 20, Tsl = 15;
 
 typedef struct {
   unsigned int p: 1, u: 1, w: 1, c: 1, f: 1;
 
-  unsigned int kondensation;
-  unsigned int trocknen;
-  unsigned int waermen;
-  unsigned int kuehlen;
-  unsigned int fail;
-  unsigned int duty;
-  unsigned int zyklen;
+  unsigned long kondensation:32;
+  unsigned long trocknen:32;
+  unsigned long waermen:32;
+  unsigned long kuehlen:32;
+  unsigned long fail:32;
+  unsigned long duty:32;
+  unsigned long zyklen:32;
 } debug;
 debug d;
 
